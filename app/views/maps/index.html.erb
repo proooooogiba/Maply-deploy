@@ -1,0 +1,162 @@
+<script type="text/javascript">
+    ymaps.ready(init);
+    var MyMap;
+
+    function init() {
+        myMap = new ymaps.Map('ymap', {
+            center: [55.76, 37.64],
+            zoom: 10
+        });
+
+        myMap.controls.remove('searchControl');
+        myMap.controls.remove('trafficControl');
+        myMap.controls.remove('typeSelector');
+        myMap.controls.remove('fullscreenControl');
+        myMap.controls.remove('rulerControl');
+        myMap.controls.remove('miniMap');
+
+        let geolocation = ymaps.geolocation;
+
+        geolocation.get({
+            provider: 'browser',
+            mapStateAutoApply: true
+        }).then(function (result) {
+            result.geoObjects.options.set('preset', 'islands#blueCircleIcon');
+            result.geoObjects.get(0).properties.set({
+                balloonContentBody: 'Moe местоположение'
+            });
+            document.getElementById('latitude').value = result.geoObjects.get(0).geometry.getCoordinates()[0];
+            document.getElementById('longitude').value = result.geoObjects.get(0).geometry.getCoordinates()[1];
+            document.getElementById('Update').click();
+            myMap.geoObjects.add(result.geoObjects);
+        });
+
+        myMap.copyrights.add('© 2022 Иван Погиба');
+        show_users(<%= current_user.followers.count %>);
+    }
+
+    function show_users(length) {
+        for (let i = 0; i < length; i++) {
+            latitude = document.getElementById('user-latitude-' + i).textContent;
+            longitude = document.getElementById('user-longitude-' + i).textContent;
+            email = document.getElementById('user-email-' + i).textContent;
+            updated_at = document.getElementById('user-updated_at-' + i).textContent;
+            avatar = document.getElementById('user-avatar-' + i);
+            id = document.getElementById('user-id-' + i).textContent;
+            myPlacemark = new ymaps.Placemark([parseFloat(latitude), parseFloat(longitude)], {
+                balloonContentHeader: '<a href = "/user/show_user_profile/' + id + '">' + email + '</a><br>',
+                balloonContentBody: avatar.innerHTML + '<br>' +
+                    '<b>Последний раз заходил в ' + updated_at + '</b> <br/>',
+                // hintContent: name
+            },
+                {
+                    iconLayout: 'default#image',
+                    iconImageHref: avatar.getElementsByTagName("img")[0].getAttribute("src"),
+                    iconImageSize: [40, 40],
+                    iconImageOffset: [-5, -38]
+                }
+            );
+
+            myMap.geoObjects.add(myPlacemark);
+        }
+    }
+
+</script>
+<div class="row">
+    <div class="col-9" style="margin: 0; padding: 0;">
+        <div id="ymap" class="map"></div>
+    </div>
+
+    <div class="col-3" style="margin: 0; padding: 0;">
+
+        <div class="container py-1">
+            <div class="row">
+                <div class="card-body text-center">
+                        <%= image_tag(current_user.avatar_thumbnail, size: "96x96" , style: "width: 150px;" ,
+                            class: "rounded-circle img-fluid" ) %>
+                                        <h5 class="my-3">
+                                            <%= current_user.full_name %>
+                                        </h5>
+                                        <p class="text-muted mb-1">
+                                            <%= current_user.email %>
+                                        </p>
+                                        <p class="text-muted mb-4">
+                                            <%= t('maps.last_update', time: time_ago_in_words(current_user.updated_at)) %>
+                                        </p>
+                </div>
+            </div>
+        </div>
+        <hr>
+                    <% current_user.follow_requests.each do |request| %>
+                      <%= t('maps.want_to_be_your_friend', name: request.followerable.full_name) %>
+                      <div class="mt-2">
+                      <div class="d-inline-block">
+                        <%= button_to t(:accept), accept_path(request.followerable), id: "accept_id", class: 'btn btn-primary btn-sm' %>
+                      </div>
+                    <div class="d-inline-block ms-2"><%= button_to t(:decline), decline_path(request.followerable), class: 'btn btn-danger btn-sm' %></div>
+                        </div>
+                    <hr>
+                    <% end %>
+
+            <div class="container text-center py-1">
+                <%= form_with url: find_nearest_path do |form| %>
+                    <%= form.submit t('maps.nearest_person'), class: "btn btn-primary", id: "nearest-person" %>
+                <% end %>
+                <div id='find-nearest-container'></div>
+            </div>
+                <hr>
+            <div class="text-center">
+                    <% if current_user.followers.count !=0%>
+                            <div class="prose lg:prose-xl mb-4">
+                                <%= form_with url: find_nearest_friend_path do |form| %>
+                                    <%= form.submit t('maps.nearest_firend') , class: "btn btn-primary" %>
+                                <% end %>
+                            </div>
+                            <% end %>
+                <div id='find-nearest-friend-container'></div>
+        <div class="container">
+            <%= form_tag maps_path, method: :get, data: { turbo_frame: "search-results" , turbo_action: "advance" } do |f|%>
+                <div class="input-group">
+                    <%= text_field_tag :query, nil, placeholder: "Search user" , class: "form-control" %>
+                    <%= submit_tag t(:search) , class: "btn btn btn-primary", id: "search_id" %>
+                </div>
+            <% end %>
+            <%= turbo_frame_tag "search-results" do %>
+            <%= render partial: "maps/list" , locals: { contacts: @users } %>
+            <% end %>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+<div id="users" style="display: none;">
+    <% current_user.followers.each_with_index do |user, index|%>
+        <p id="user-email-<%=index%>">
+            <%= user.email %>
+        </p>
+        <p id="user-latitude-<%=index%>">
+            <%= user.latitude%>
+        </p>
+        <p id="user-longitude-<%=index%>">
+            <%= user.longitude%>
+        </p>
+        <p id="user-updated_at-<%=index%>">
+            <%= user.updated_at%>
+        </p>
+        <p id="user-id-<%=index%>">
+            <%= user.id%>
+        </p>
+        <p id="user-avatar-<%=index%>">
+            <%= image_tag(user.avatar, size:"96x96") %>
+        <%end%>
+</div>
+</div>
+
+<%= form_with url: result_path do |f| %>
+    <div style="display: none">
+        <%= f.text_field :latitude, id: :latitude %>
+            <%= f.text_field :longitude, id: :longitude %>
+                <%= f.submit t('maps.update_geolocation') , id: "Update" , class: "btn btn-primary" %>
+    </div>
+    <%end%>
