@@ -78,6 +78,7 @@ group :test do
   gem 'webdrivers'
 end
 
+gem 'aws-sdk-s3', require: false
 gem 'followability', github: 'nejdetkadir/followability', branch: 'main'
 gem 'geocoder'
 gem 'omniauth'
