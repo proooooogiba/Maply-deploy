@@ -4,7 +4,7 @@ require 'active_support/core_ext/integer/time'
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  config.hosts << "maply-deploy-production-9f76.up.railway.app"
+  # config.hosts << "maply-deploy-production-9f76.up.railway.app"
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -16,6 +16,14 @@ Rails.application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
+
+  host = "maply-deploy-production-9f76.up.railway.app"
+  protocol = config.force_ssl ? 'https' : 'http'
+
+  config.action_controller.default_url_options = {
+    host: host,
+    protocol: protocol
+  }
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
