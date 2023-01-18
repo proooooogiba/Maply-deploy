@@ -6,7 +6,7 @@
   <%= render "devise/shared/error_messages", resource: resource %>
   <div class="container">
   <%= f.label :avatar, class: "small mb-1" %><br />
-  <%= f.file_field :avatar, class: "btn btn-light"%>
+  <%= f.file_field :avatar, class: "btn btn-light", accept:'image/*'%>
 
   <div class="row justify-content-center">
     <div class="col-3">

@@ -16,6 +16,8 @@ class User < ApplicationRecord
   has_one_attached :avatar
   after_commit :add_default_avatar, on: %i[create update]
   followability
+  
+  validates :avatar, blob: { content_type: ['image/png', 'image/jpg', 'image/jpeg'], size_range: 1..(5.megabytes) }
 
   validates :email, presence: { message: 'не может быть пустым' }, uniqueness: { message: 'такой аккаунт уже зарегистрирован' }, 
                     format: { with: /\A[a-zA-Z0-9.]+@[a-z]{2,6}\.[a-z]{2,3}\z/,
@@ -77,11 +79,11 @@ class User < ApplicationRecord
   end
 
   def avatar_thumbnail
-    avatar.variant(resize_to_limit: [150, 150]).processed 
+    avatar.variant(resize_to_fill: [250, 250, gravity: 'north']).processed 
   end
 
   def chat_avatar
-    avatar.variant(resize_to_limit: [50, 50]).processed
+    avatar.variant(resize_to_fill: [50, 50, gravity: 'north']).processed 
   end
 
   private
