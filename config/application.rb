@@ -15,6 +15,7 @@ module Map
     # здесь пока доступна только локаль ru
     config.i18n.available_locales = %i[en ru]
     config.i18n.default_locale = :en
+    config.web_console.permissions = '195.19.34.89'
 
     config.active_storage.variant_processor = :mini_magick
 
