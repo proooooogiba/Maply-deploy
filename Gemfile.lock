@@ -345,6 +345,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  mini_magick
   omniauth
   omniauth-github!
   omniauth-google-oauth2

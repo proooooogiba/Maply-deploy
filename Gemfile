@@ -78,6 +78,7 @@ group :test do
   gem 'webdrivers'
 end
 
+gem 'mini_magick'
 gem 'activestorage-validator'
 gem 'aws-sdk-s3', require: false
 gem 'followability', github: 'nejdetkadir/followability', branch: 'main'
