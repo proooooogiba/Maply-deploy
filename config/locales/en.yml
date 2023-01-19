@@ -47,7 +47,7 @@ en:
   send_me_resst_instructions: "Send me reset password instructions"
   profile_picture: "Profile picture"
   account_details: "Account details"
-  input_avatar: "JPG or PNG no larger than 5 MB"
+  input_avatar: "PNG no larger than 5 MB"
   currently_waiting: "Currently waiting confirmation for:"
   current_password_to_confirm: "we need your current password to confirm your changes"
   save_changes: "Save changes"
